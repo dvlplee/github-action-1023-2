@@ -10,8 +10,8 @@ on:
       - main
 
 permissions:
-  contents: write
-  packages: write
+  contents: write     # 태그 및 릴리즈 생성
+  packages: write     # GHCR 이미지 푸시
 
 jobs:
   makeTagAndRelease:
@@ -46,22 +46,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ✅ password.html 생성 (인코딩 없이)
+      # ✅ password.html 생성 (줄바꿈 및 따옴표 깨짐 방지)
       - name: password.html 생성
         env:
           PASSWORD_HTML: ${{ secrets.PASSWORD_HTML }}
         run: |
-          echo "===== PASSWORD_HTML 값 시작 ====="
-          echo "$PASSWORD_HTML"
-          echo "===== PASSWORD_HTML 값 끝 ====="
-
-          # Secrets 내용을 그대로 파일로 저장
-          echo "$PASSWORD_HTML" > password.html
-
-          echo "==== 생성된 파일 목록 ===="
-          ls -al
-          echo "==== 파일 내용 ===="
-          cat password.html
+          printf "%s" "$PASSWORD_HTML" > password.html
+          echo "password.html 생성 완료 ✅"
+          ls -al password.html
 
       - name: Docker Buildx 설치
         uses: docker/setup-buildx-action@v2
